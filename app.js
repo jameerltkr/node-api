@@ -38,11 +38,8 @@ app.set('superSecret', config.secret); // secret variable
 // use morgan to log requests to the console
 app.use(morgan('dev'));
 
-
-
-
-app.use('/', routes);
-app.use('/users', users);
+app.use('/api', routes);
+app.use('/api/users', users);
 
 
 // catch 404 and forward to error handler
@@ -76,6 +73,6 @@ app.use(function(err, req, res, next) {
   });
 });
 
-var multipart = require('connect-multiparty');var multipart = require('connect-multiparty');
+var multipart = require('connect-multiparty');
 app.listen(4000,function(){console.log('Server started')});
 module.exports = app;

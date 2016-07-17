@@ -4,7 +4,6 @@ var router = express.Router();
 var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 
 var User = require('../model/user');
-
 var config = require('../bin/config');
 
 /* GET users listing. */
