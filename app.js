@@ -11,7 +11,10 @@ var morgan      = require('morgan');
 var mydb = require('./model/DB');
 var routes = require('./routes/index');
 var users = require('./routes/users');
-
+var status = require('./routes/status');
+var comment = require('./routes/comment');
+var follow = require('./routes/follow');
+var report = require('./routes/report');
 var app = express();
 
 var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
@@ -40,6 +43,10 @@ app.use(morgan('dev'));
 
 app.use('/api', routes);
 app.use('/api/users', users);
+app.use('/api/status', status);
+app.use('/api/comment', comment);
+app.use('/api/follow', follow);
+app.use('/api/report', report);
 
 
 // catch 404 and forward to error handler
@@ -73,4 +80,5 @@ app.use(function(err, req, res, next) {
   });
 });
 
+app.listen(4000,function(){console.log('Server started')});
 module.exports = app;
