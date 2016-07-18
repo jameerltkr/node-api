@@ -38,8 +38,8 @@ app.set('superSecret', config.secret); // secret variable
 // use morgan to log requests to the console
 app.use(morgan('dev'));
 
-app.use('/', routes);
-app.use('/users', users);
+app.use('/api', routes);
+app.use('/api/users', users);
 
 
 // catch 404 and forward to error handler
