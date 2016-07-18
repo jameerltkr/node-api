@@ -11,7 +11,7 @@ router.get('/', auth, function(req, res, next) {
   res.send('respond with a resource');
 });
 
-router.get('/test', auth, function(req, res, next){
+router.get('/login', auth, function(req, res, next){
   res.send('Request is authenticated against JWT.');
 })
 
