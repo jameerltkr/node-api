@@ -1,5 +1,4 @@
 var express = require('express');
-var users = require('../model/user.js');
 var router = express.Router();
 
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
@@ -15,14 +14,13 @@ router.get('/', auth, function (req, res, next) {
 });
 
 
-
 router.post('/add', function (req, res, next) {
 
     /*console.log("------>data 2= ", req.body);
     console.log("Email is ", req.body.email);
     console.log("reqQuery - >", req.query);
     res.send(req.body.email);*/
-    var collection = new users({
+    var collection = new User({
         email: req.body.email,
         name: req.body.name,
         username: req.body.username,
@@ -60,7 +58,7 @@ router.post('/add', function (req, res, next) {
         }
         var json = JSON.stringify({
             'meta': meta,
-            'data': finalData
+            'token': generateToken(result)
         });
         res.send(json);
     });
@@ -90,7 +88,7 @@ router.post('/authenticate', function (req, res, next) {
 
             // check if password matches
             if (user.password != req.body.password) {
-                res.json({ success: false, message: 'Authentication failed+02+. Wrong password.' });
+                res.json({ success: false, message: 'Authentication failed. Wrong password.' });
             } else {
 
                 // if user is found and password is right
@@ -111,6 +109,15 @@ router.post('/authenticate', function (req, res, next) {
 
     });
 });
+
+function generateToken(user) {
+    // create a token
+    var token = jwt.sign(user, config.secret, {
+        expiresIn: 60 * 60 * 24 // expires in 24 hours
+    });
+
+    return token;
+}
 
 // route middleware to verify a token
 function auth(req, res, next) {
