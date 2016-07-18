@@ -1,5 +1,5 @@
 // This Model is responsible for connecting to our Mongo DB via Mongoose
-var mongoose= require("mongoose");
+var mongoose = require("mongoose");
 
 var config = require('../bin/config');
 
@@ -7,15 +7,15 @@ var config = require('../bin/config');
 host = 'localhost';
 var port = 27017;
 var dbName = config.database;
-mongoose.connect('mongodb://'+host+':'+port+'/'+dbName);
+mongoose.connect('mongodb://' + host + ':' + port + '/' + dbName);
 var myDB = mongoose.connection;
 //Error handling if conncetion fails
 myDB.on('error', console.error.bind(console, 'connection error:'));
 //Check if successful connection is made
-myDB.once('open', function callback () {
-  console.log("node-api-server DB Connected with Mongoose");
+myDB.once('open', function callback() {
+    console.log("node-api-server DB Connected with Mongoose");
 });
 
 module.exports = {
-   myDB: myDB
+    myDB: myDB
 };

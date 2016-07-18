@@ -3,22 +3,22 @@ var uniqueValidator = require('mongoose-unique-validator');
 var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
-	email: {
+    email: {
         type: String,
         required: 'Email for user is required!',
         trim: true,
         require: true
     },
-	name: {type: String},
-	username: {type: String, unique: true, require: true},
-	website: {type: String, unique: true},
-	bio: {type: String},
-	phone_number: {type: Number},
-	gender: {type:String},
-	profile_pic:  
+    name: { type: String },
+    username: { type: String, unique: true, require: true },
+    website: { type: String, unique: true },
+    bio: { type: String },
+    phone_number: { type: Number },
+    gender: { type: String },
+    profile_pic:
 	{
-		data: {type: Buffer}, 
-		contentType: {type: String}
+	    data: { type: Buffer },
+	    contentType: { type: String }
 	},
     password: {
         type: String,

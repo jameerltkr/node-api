@@ -1,6 +1,6 @@
 module.exports = {
 
-    secret: 'ilovescotchyscotch',
+    secret: 'node-api-server-secret',
     database: 'node-api-server'
 
 };
