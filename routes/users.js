@@ -7,9 +7,13 @@ var User = require('../model/user');
 var config = require('../bin/config');
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
+router.get('/', auth, function(req, res, next) {
   res.send('respond with a resource');
 });
+
+router.get('/test', auth, function(req, res, next){
+  res.send('Request is authenticated against JWT.');
+})
 
 // route to authenticate a user (POST http://localhost:8080/api/authenticate)
 router.post('/authenticate', function(req, res) {
@@ -18,6 +22,8 @@ router.post('/authenticate', function(req, res) {
   User.findOne({
     name: req.body.name
   }, function(err, user) {
+
+    console.log(user);
 
     if (err) throw err;
 
@@ -49,8 +55,36 @@ router.post('/authenticate', function(req, res) {
   });
 });
 
-// apply the routes to our application with the prefix /api
-//express().use('/api', router);
+// route middleware to verify a token
+function auth(req, res, next) {
 
+  // check header or url parameters or post parameters for token
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+  // decode token
+  if (token) {
+
+    // verifies secret and checks exp
+    jwt.verify(token, config.secret, function(err, decoded) {      
+      if (err) {
+        return res.json({ success: false, message: 'Failed to authenticate token.' });    
+      } else {
+        // if everything is good, save to request for use in other routes
+        req.decoded = decoded;    
+        next();
+      }
+    });
+
+  } else {
+
+    // if there is no token
+    // return an error
+    return res.status(403).send({ 
+        success: false, 
+        message: 'No token provided.' 
+    });
+    
+  }
+};
 
 module.exports = router;
