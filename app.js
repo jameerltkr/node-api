@@ -73,5 +73,4 @@ app.use(function(err, req, res, next) {
   });
 });
 
-var multipart = require('connect-multiparty');
 module.exports = app;
