@@ -3,7 +3,12 @@ var router = express.Router();
 
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 
+var bCrypt = require('bcrypt-nodejs');
+
+var passport = require('passport');
+
 var User = require('../model/user');
+var middleware = require('../middleware/passport');
 var config = require('../bin/config');
 var meta = { code: Number, data_property_name: String, error: String };
 var finalData = {};
@@ -14,12 +19,14 @@ router.get('/', auth, function (req, res, next) {
 });
 
 
-router.post('/add', function (req, res, next) {
+router.post('/signup', function (req, res, next) {
 
     /*console.log("------>data 2= ", req.body);
     console.log("Email is ", req.body.email);
     console.log("reqQuery - >", req.query);
     res.send(req.body.email);*/
+    var userPassword = createHash(req.body.password);
+
     var collection = new User({
         email: req.body.email,
         name: req.body.name,
@@ -33,7 +40,7 @@ router.post('/add', function (req, res, next) {
           data: "data:image/png;base64,"+(fs.readFileSync(req.files.profile_pic.path)).toString('base64'), 
           contentType : 'image/png'
         },*/
-        password: req.body.password
+        password: userPassword
     });
 
     collection.save(function (error, result) {
@@ -58,6 +65,7 @@ router.post('/add', function (req, res, next) {
         }
         var json = JSON.stringify({
             'meta': meta,
+            'data' : finalData,
             'token': generateToken(result)
         });
         res.send(json);
@@ -65,12 +73,12 @@ router.post('/add', function (req, res, next) {
 });
 
 
+router.get('/login',
+    passport.authenticate('login'),
+    function(req, res, next) {
+        res.send('Request is authenticated against JWT.');
+    });
 
-router.get('/login', auth, function (req, res, next) {
-    res.send('Request is authenticated against JWT.');
-})
-
-// route to authenticate a user (POST http://localhost:8080/api/authenticate)
 router.post('/authenticate', function (req, res, next) {
 
     // find the user
@@ -152,3 +160,8 @@ function auth(req, res, next) {
 };
 
 module.exports = router;
+
+// Generates hash using bCrypt
+var createHash = function (password) {
+    return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
+}
