@@ -21,12 +21,15 @@ router.get('/', function (req, res, next) {
     res.send('respond with a resource');
 });
 
-router.post('/signup', function (req, res, next) {
+
+//http://localhost:3000/api/users/create
+router.post('/create', function (req, res, next) {
 
     /*console.log("------>data 2= ", req.body);
     console.log("Email is ", req.body.email);
     console.log("reqQuery - >", req.query);
     res.send(req.body.email);*/
+
     var userPassword = MiddlewarePassport.CreateHash(req.body.password);
 
     var collection = new User({
@@ -57,23 +60,96 @@ router.post('/signup', function (req, res, next) {
             }
             Meta.code = 404;
             Meta.data_property_name = "";
-            FinalData = "";
+            FinalData = error;
         }
         else {
             console.log("User saved successfully!");
             Meta.code = 200;
             Meta.data_property_name = "";
             Meta.error = "";
-            FinalData = result;
+            FinalData = "User created inserted successfully.";
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data' : FinalData,
-            'token': MiddlewareJwt.GenerateToken(result)
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
     });
 });
+
+//localhost:3000/api/users/retrieve
+router.get('/retrieve', function(req, res, next){
+    User.find({}, function(error, result){
+        if(error){
+            console.log("> Getting Error in users/retrieve.",error);
+            Meta.code = 404;
+            Meta.error = "Error: "+error;
+            Meta.data_property_name = "";
+            FinalData = "";
+        }else{
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+//localhost:3000/api/users/retrieve/:userId
+router.get('/retrieve/:userId', function(req, res, next){
+    User.findOne({_id: req.params.userId}, function(error, result){
+        if(error){
+            console.log("> Getting Error in users/retrieve/:userId.",error);
+            Meta.code = 404;
+            Meta.error = "Error: "+error;
+            Meta.data_property_name = "";
+            FinalData = "No record found for this userId.";
+        }else{
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+//localhost:3000/api/users/retrieve/:userId
+router.delete('/delete/:userId', function(req, res, next){
+    User.remove({_id: req.params.userId}, function(error, result){
+        if(error){
+            console.log("> Getting Error in users/delete/:userId.",error);
+            Meta.code = 404;
+            Meta.error = "Error: "+error;
+            Meta.data_property_name = "";
+            FinalData = "No record found for this userId.";
+        }else{
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+
+
+
 
 router.get('/login',
     Passport.authenticate('login'),

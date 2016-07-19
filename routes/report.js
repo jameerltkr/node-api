@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var report = require('../model/report');
+var Report = require('../model/report');
 var meta = { code: Number, data_property_name: String, error: String };
 var finalData = {};
 /* GET home page. */
@@ -8,13 +8,13 @@ router.get('/', function (req, res, next) {
     res.render('index', { title: 'Express' });
 });
 
-router.post('/add', function (req, res, next) {
+router.post('/create', function (req, res, next) {
 
     /*console.log("------>data 2= ", req.body);
     console.log("Email is ", req.body.email);
     console.log("reqQuery - >", req.query);
     res.send(req.body.email);*/
-    var collection = new report({
+    var collection = new Report({
         alleged_id: req.body.alleged_id,
         type: req.body.type,
         description: req.body.description
@@ -22,7 +22,7 @@ router.post('/add', function (req, res, next) {
 
     collection.save(function (error, result) {
         if (error) {
-            console.log("Getting ERROR in reports/add API.", error);
+            console.log("Getting ERROR in reports/create API.", error);
 
             if (error.name == 'ValidationError') {
                 meta.error = "Error: Validation Error.";
@@ -48,4 +48,73 @@ router.post('/add', function (req, res, next) {
     });
 });
 
+//localhost:3000/api/report/retrieve
+router.get('/retrieve', function(req, res, next){
+    Report.find({}, function(error, result){
+        if(error){
+            console.log("> Getting Error in report/retrieve.",error);
+            Meta.code = 404;
+            Meta.error = "Error: "+error;
+            Meta.data_property_name = "";
+            FinalData = "";
+        }else{
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+//localhost:3000/api/report/retrieve/:statusId
+router.get('/retrieve/:reportId', function(req, res, next){
+    Report.findOne({_id: req.params.reportId}, function(error, result){
+        if(error){
+            console.log("> Getting Error in report/retrieve/:reportId.",error);
+            Meta.code = 404;
+            Meta.error = "Error: "+error;
+            Meta.data_property_name = "";
+            FinalData = "No record found for this reportId.";
+        }else{
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+//localhost:3000/api/report/delete/:statusId
+router.delete('/delete/:reportId', function(req, res, next){
+    Report.remove({_id: req.params.reportId}, function(error, result){
+        if(error){
+            console.log("> Getting Error in report/delete/:reportId.",error);
+            Meta.code = 404;
+            Meta.error = "Error: "+error;
+            Meta.data_property_name = "";
+            FinalData = "No record found for this reportId.";
+        }else{
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
 module.exports = router;

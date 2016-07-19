@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var follow = require('../model/follow');
+var Follow = require('../model/follow');
 var meta = { code: Number, data_property_name: String, error: String };
 var finalData = {};
 
@@ -9,13 +9,9 @@ router.get('/', function (req, res, next) {
     res.render('index', { title: 'Express' });
 });
 
-router.post('/add', function (req, res, next) {
+router.post('/create', function (req, res, next) {
 
-    /*console.log("------>data 2= ", req.body);
-    console.log("Email is ", req.body.email);
-    console.log("reqQuery - >", req.query);
-    res.send(req.body.email);*/
-    var collection = new follow({
+    var collection = new Follow({
         text: { type: String },
         likes: [{ type: Schema.Types.ObjectId, ref: 'StatusLike' }],
         comments: [{ type: Schema.Types.ObjectId, ref: 'Comments' }],
@@ -50,4 +46,73 @@ router.post('/add', function (req, res, next) {
     });
 });
 
+//localhost:3000/api/follow/retrieve
+router.get('/retrieve', function(req, res, next){
+    Follow.find({}, function(error, result){
+        if(error){
+            console.log("> Getting Error in follow/retrieve.", error);
+            Meta.code = 404;
+            Meta.error = "Error: "+error;
+            Meta.data_property_name = "";
+            FinalData = "";
+        }else{
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+//localhost:3000/api/follow/retrieve/:statusId
+router.get('/retrieve/:followId', function(req, res, next){
+    Follow.findOne({_id: req.params.followId}, function(error, result){
+        if(error){
+            console.log("> Getting Error in follow/retrieve/:followId.",error);
+            Meta.code = 404;
+            Meta.error = "Error: "+error;
+            Meta.data_property_name = "";
+            FinalData = "No record found for this followId.";
+        }else{
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+//localhost:3000/api/follow/delete/:statusId
+router.delete('/delete/:followId', function(req, res, next){
+    Follow.remove({_id: req.params.followId}, function(error, result){
+        if(error){
+            console.log("> Getting Error in follow/delete/:followId.",error);
+            Meta.code = 404;
+            Meta.error = "Error: "+error;
+            Meta.data_property_name = "";
+            FinalData = "No record found for this followId.";
+        }else{
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
 module.exports = router;
