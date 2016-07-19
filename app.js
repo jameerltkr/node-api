@@ -80,5 +80,4 @@ app.use(function (err, req, res, next) {
     });
 });
 
-app.listen(4000, function () { console.log('Server started') });
 module.exports = app;
