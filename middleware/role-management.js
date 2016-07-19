@@ -2,7 +2,7 @@
 
 var User = new ConnectRoles();
 
-//anonymous users can only access the home page 
+//anonymous users
 //returning false stops any more rules from being 
 //considered 
 User.use(function(req, action) {

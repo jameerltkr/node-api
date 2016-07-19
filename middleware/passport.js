@@ -5,6 +5,10 @@ var LocalStrategy = require('passport-local').Strategy;
 var User = require('../model/user');
 var bCrypt = require('bcrypt-nodejs');
 
+var Jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
+
+var Config = require('../bin/config');
+
 passport.use('login', new LocalStrategy({
     passReqToCallback: true
 },
@@ -52,6 +56,7 @@ passport.use('login', new LocalStrategy({
         }
       );
   }));
+  
 
 // User Signup
 passport.use('signup', new LocalStrategy({

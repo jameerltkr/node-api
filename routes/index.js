@@ -10,6 +10,12 @@ router.get('/', roleUser.can('access home page'), function (req, res, next) {
     res.send('test');
 });
 
+/* GET home page. */
+router.get('/test', MiddlewareJwt.Auth, function (req, res, next) {
+	console.log(req.isAuthenticated());
+    res.send('test');
+});
+
 router.get('/private', roleUser.can('access private page'), function (req, res, next) {
     console.log(req.user.role);
     res.send('test');

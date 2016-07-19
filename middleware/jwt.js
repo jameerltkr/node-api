@@ -26,8 +26,20 @@ var Auth = function (req, res, next) {
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
             } else {
                 // if everything is good, save to request for use in other routes
-                req.decoded = decoded;
-                next();
+
+				// get the decoded payload and header
+				var decoded = Jwt.decode(token, {complete: true});
+				var user = decoded.payload._doc;	// Get the user from JWT Token
+				
+				req.login(user, function (errr) {
+					if(errr){
+						return res.json({ success: false, message: 'Failed to authenticate user.' });
+					}else{				
+						req.decoded = decoded;
+						next();
+					}
+				});	// Log In the user using Passport Authentication
+				
             }
         });
 
