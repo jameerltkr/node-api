@@ -6,7 +6,10 @@ var cookieParser = require('cookie-parser');
 var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 
-var morgan = require('morgan');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+
+var roleManagement = require('./middleware/role-management');
 
 var mydb = require('./model/DB');
 var routes = require('./routes/index');
@@ -15,6 +18,7 @@ var status = require('./routes/status');
 var comment = require('./routes/comment');
 var follow = require('./routes/follow');
 var report = require('./routes/report');
+var User = require('./model/user');
 var app = express();
 
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
@@ -36,10 +40,21 @@ app.use(require('express-session')({
     resave: false,
     saveUninitialized: false
 }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(roleManagement.middleware());
+
 app.set('superSecret', config.secret); // secret variable
 
-// use morgan to log requests to the console
-app.use(morgan('dev'));
+// passport needs ability to serialize and deserialize users out of session
+passport.serializeUser(function (user, done) {
+    done(null, user._id);
+});
+passport.deserializeUser(function (id, done) {
+    User.findById(id, function (err, user) {
+        done(err, user);
+    });
+});
 
 app.use('/api', routes);
 app.use('/api/users', users);
@@ -47,7 +62,6 @@ app.use('/api/status', status);
 app.use('/api/comment', comment);
 app.use('/api/follow', follow);
 app.use('/api/report', report);
-
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -15,7 +15,9 @@ var Meta = { code: Number, data_property_name: String, error: String };
 var FinalData = {};
 
 /* GET users listing. */
-router.get('/', MiddlewareJwt.Auth, function (req, res, next) {
+router.get('/', function (req, res, next) {
+    console.log(req.isAuthenticated());
+    console.log(req.user.role);
     res.send('respond with a resource');
 });
 
@@ -40,7 +42,8 @@ router.post('/signup', function (req, res, next) {
           data: "data:image/png;base64,"+(fs.readFileSync(req.files.profile_pic.path)).toString('base64'), 
           contentType : 'image/png'
         },*/
-        password: userPassword
+        password: userPassword,
+        role: req.body.role
     });
 
     collection.save(function (error, result) {

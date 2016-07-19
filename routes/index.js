@@ -1,11 +1,23 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
-    console.log(req.url);
+var MiddlewareJwt = require('../middleware/jwt');
+var roleUser = require('../middleware/role-management');
 
-    res.render('index', { title: 'Express' });
+/* GET home page. */
+router.get('/', roleUser.can('access home page'), function (req, res, next) {
+
+    res.send('test');
+});
+
+router.get('/private', roleUser.can('access private page'), function (req, res, next) {
+    console.log(req.user.role);
+    res.send('test');
+});
+
+router.get('/admin', roleUser.can('access admin page'), function (req, res, next) {
+    console.log(req.user.role);
+    res.send('test');
 });
 
 module.exports = router;

@@ -25,6 +25,12 @@ var UserSchema = new Schema({
         //required: 'Password for user is required!',
         //require: true,
         trim: true
+    },
+    role: {
+        type: String,
+        required: 'Role is required!',
+        require: true,
+        trim: true
     }
 });
 
