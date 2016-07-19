@@ -1,23 +1,23 @@
 var express = require('express');
 var router = express.Router();
 
-var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
-
 var bCrypt = require('bcrypt-nodejs');
 
-var passport = require('passport');
+var Passport = require('passport');
 
 var User = require('../model/user');
-var middleware = require('../middleware/passport');
-var config = require('../bin/config');
-var meta = { code: Number, data_property_name: String, error: String };
-var finalData = {};
+
+var MiddlewarePassport = require('../middleware/passport');
+var MiddlewareJwt = require('../middleware/jwt');
+
+var Config = require('../bin/config');
+var Meta = { code: Number, data_property_name: String, error: String };
+var FinalData = {};
 
 /* GET users listing. */
-router.get('/', auth, function (req, res, next) {
+router.get('/', MiddlewareJwt.Auth, function (req, res, next) {
     res.send('respond with a resource');
 });
-
 
 router.post('/signup', function (req, res, next) {
 
@@ -25,7 +25,7 @@ router.post('/signup', function (req, res, next) {
     console.log("Email is ", req.body.email);
     console.log("reqQuery - >", req.query);
     res.send(req.body.email);*/
-    var userPassword = createHash(req.body.password);
+    var userPassword = MiddlewarePassport.CreateHash(req.body.password);
 
     var collection = new User({
         email: req.body.email,
@@ -48,33 +48,32 @@ router.post('/signup', function (req, res, next) {
             console.log("Getting ERROR in users/add API.", error);
 
             if (error.name == 'ValidationError') {
-                meta.error = "Error: Validation Error.";
+                Meta.error = "Error: Validation Error.";
             } else {
-                meta.error = "Error: " + error;
+                Meta.error = "Error: " + error;
             }
-            meta.code = 404;
-            meta.data_property_name = "";
-            finalData = "";
+            Meta.code = 404;
+            Meta.data_property_name = "";
+            FinalData = "";
         }
         else {
             console.log("User saved successfully!");
-            meta.code = 200;
-            meta.data_property_name = "";
-            meta.error = "";
-            finalData = result;
+            Meta.code = 200;
+            Meta.data_property_name = "";
+            Meta.error = "";
+            FinalData = result;
         }
         var json = JSON.stringify({
-            'meta': meta,
-            'data' : finalData,
-            'token': generateToken(result)
+            'meta': Meta,
+            'data' : FinalData,
+            'token': MiddlewareJwt.GenerateToken(result)
         });
         res.send(json);
     });
 });
 
-
 router.get('/login',
-    passport.authenticate('login'),
+    Passport.authenticate('login'),
     function(req, res, next) {
         res.send('Request is authenticated against JWT.');
     });
@@ -101,7 +100,7 @@ router.post('/authenticate', function (req, res, next) {
 
                 // if user is found and password is right
                 // create a token
-                var token = jwt.sign(user, config.secret, {
+                var token = jwt.sign(user, Config.secret, {
                     expiresIn: 60 * 60 * 24 // expires in 24 hours
                 });
 
@@ -118,50 +117,4 @@ router.post('/authenticate', function (req, res, next) {
     });
 });
 
-function generateToken(user) {
-    // create a token
-    var token = jwt.sign(user, config.secret, {
-        expiresIn: 60 * 60 * 24 // expires in 24 hours
-    });
-
-    return token;
-}
-
-// route middleware to verify a token
-function auth(req, res, next) {
-
-    // check header or url parameters or post parameters for token
-    var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
-    // decode token
-    if (token) {
-
-        // verifies secret and checks exp
-        jwt.verify(token, config.secret, function (err, decoded) {
-            if (err) {
-                return res.json({ success: false, message: 'Failed to authenticate token.' });
-            } else {
-                // if everything is good, save to request for use in other routes
-                req.decoded = decoded;
-                next();
-            }
-        });
-
-    } else {
-
-        // if there is no token
-        // return an error
-        return res.status(403).send({
-            success: false,
-            message: 'No token provided.'
-        });
-
-    }
-};
-
 module.exports = router;
-
-// Generates hash using bCrypt
-var createHash = function (password) {
-    return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
-}

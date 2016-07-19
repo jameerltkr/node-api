@@ -26,7 +26,7 @@ passport.use('login', new LocalStrategy({
                       { 'message': 'User Not found.' });
             }
             // User exists but wrong password, log the error 
-            if (!isValidPassword(user, password)) {
+            if (!IsValidPassword(user, password)) {
                 console.log('Invalid Password');
 
                 req.session.loginmessage = 'Invalid password';
@@ -79,7 +79,7 @@ passport.use('signup', new LocalStrategy({
                   var newUser = new User();
                   // set the user's local credentials
                   newUser.username = username;
-                  newUser.password = createHash(password);
+                  newUser.password = CreateHash(password);
 
                   // save the user
                   newUser.save(function (err) {
@@ -100,11 +100,15 @@ passport.use('signup', new LocalStrategy({
       process.nextTick(findOrCreateUser);
   }));
 
-var isValidPassword = function (user, password) {
+var IsValidPassword = function (user, password) {
     return bCrypt.compareSync(password, user.password);
 }
 
 // Generates hash using bCrypt
-var createHash = function (password) {
+var CreateHash = function (password) {
     return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
 }
+
+module.exports = {
+    CreateHash: CreateHash
+};
