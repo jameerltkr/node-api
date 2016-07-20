@@ -26,11 +26,6 @@ router.get('/', function (req, res, next) {
 //http://localhost:3000/api/users/create
 router.post('/create', roleUser.can("register"), function (req, res, next) {
 
-    /*console.log("------>data 2= ", req.body);
-    console.log("Email is ", req.body.email);
-    console.log("reqQuery - >", req.query);
-    res.send(req.body.email);*/
-
     var userPassword = MiddlewarePassport.CreateHash(req.body.password);
 
     var collection = new User({
@@ -68,7 +63,7 @@ router.post('/create', roleUser.can("register"), function (req, res, next) {
             Meta.code = 200;
             Meta.data_property_name = "";
             Meta.error = "";
-            FinalData = "User created successfully.";
+            FinalData = result;
         }
         var json = JSON.stringify({
             'meta': Meta,
@@ -125,6 +120,33 @@ router.get('/retrieve/:userId', roleUser.can('access retrieve single data api'),
         res.send(json);
     });
 });
+
+//localhost:3000/api/users/update/:userId
+router.put('/update/:userId', function(req, res, next){
+    User.update({'_id':req.params.userId}, req.body, {safe: true}, function(error, result) {
+        if (error) {
+            console.log("> Getting Error in users/update/:userId.", error);
+            Meta.code = 404;
+            Meta.error = "Error: " + error;
+            Meta.data_property_name = "";
+            FinalData = "No record found for this userId.";
+        } else {
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data': FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+})
+
+
+
 //localhost:3000/api/users/retrieve/:userId
 router.delete('/delete/:userId', function (req, res, next) {
     User.remove({ _id: req.params.userId }, function (error, result) {

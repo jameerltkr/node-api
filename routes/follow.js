@@ -12,15 +12,14 @@ router.get('/', function (req, res, next) {
 router.post('/create', function (req, res, next) {
 
     var collection = new Follow({
-        text: { type: String },
-        likes: [{ type: Schema.Types.ObjectId, ref: 'StatusLike' }],
-        comments: [{ type: Schema.Types.ObjectId, ref: 'Comments' }],
-        user_id: { type: Schema.Types.ObjectId, ref: 'Users' }
+        follower_id: req.body.follower_id,
+        following_id: req.body.following_id,
+        is_follow_accepted: req.body.is_follow_accepted
     });
 
     collection.save(function (error, result) {
         if (error) {
-            console.log("Getting ERROR in follow/add API.", error);
+            console.log("Getting ERROR in follow/create API.", error);
 
             if (error.name == 'ValidationError') {
                 meta.error = "Error: Validation Error.";
@@ -92,6 +91,32 @@ router.get('/retrieve/:followId', function(req, res, next){
         res.send(json);
     });
 });
+
+
+//localhost:3000/api/follow/update/:followId
+router.put('/update/:followId', function(req, res, next){
+    Follow.update({'_id':req.params.followId}, req.body, {safe: true}, function(error, result) {
+        if (error) {
+            console.log("> Getting Error in follow/update/:followId.", error);
+            Meta.code = 404;
+            Meta.error = "Error: " + error;
+            Meta.data_property_name = "";
+            FinalData = "No record found for this followId.";
+        } else {
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data': FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+
 //localhost:3000/api/follow/delete/:statusId
 router.delete('/delete/:followId', function(req, res, next){
     Follow.remove({_id: req.params.followId}, function(error, result){

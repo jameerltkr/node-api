@@ -10,10 +10,6 @@ router.get('/', function (req, res, next) {
 
 router.post('/create', function (req, res, next) {
 
-    /*console.log("------>data 2= ", req.body);
-    console.log("Email is ", req.body.email);
-    console.log("reqQuery - >", req.query);
-    res.send(req.body.email);*/
     var collection = new Report({
         alleged_id: req.body.alleged_id,
         type: req.body.type,
@@ -89,6 +85,31 @@ router.get('/retrieve/:reportId', function(req, res, next){
         var json = JSON.stringify({
             'meta': Meta,
             'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+
+
+//localhost:3000/api/report/update/:reportId
+router.put('/update/:reportId', function(req, res, next){
+    Report.update({'_id':req.params.reportId}, req.body, {safe: true}, function(error, result) {
+        if (error) {
+            console.log("> Getting Error in report/update/:reportId.", error);
+            Meta.code = 404;
+            Meta.error = "Error: " + error;
+            Meta.data_property_name = "";
+            FinalData = "No record found for this reportId.";
+        } else {
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data': FinalData/*,
             'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);

@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var Comment = require('../model/comment');
-var commentLike = require('../model/comment-like');
+var CommentLike = require('../model/comment-like');
+var Status = require('../model/status');
 var meta = { code: Number, data_property_name: String, error: String };
 var finalData = {};
 /* GET home page. */
@@ -9,7 +10,7 @@ router.get('/', function (req, res, next) {
     res.render('index', { title: 'Express' });
 });
 
-router.post('/add-comment', function (req, res, next) {
+router.post('/comment/create', function (req, res, next) {
 
     var collection = new Comment({
         text: req.body.text,
@@ -19,7 +20,7 @@ router.post('/add-comment', function (req, res, next) {
 
     collection.save(function (error, result) {
         if (error) {
-            console.log("Getting ERROR in reports/add API.", error);
+            console.log("Getting ERROR in /comment/create API.", error);
 
             if (error.name == 'ValidationError') {
                 meta.error = "Error: Validation Error.";
@@ -32,17 +33,28 @@ router.post('/add-comment', function (req, res, next) {
         }
         else {
             /*Push into status array*/
-            console.log("Comment saved successfully!");
-            meta.code = 200;
-            meta.data_property_name = "data";
-            meta.error = "";
-            finalData = result;
+            Status.update({_id: req.body.status_id}, {$pushAll: {comments:[result._id]}},{upsert:true},function(err, result){
+                if(err){
+                    console.log("Getting ERROR in /comment/create Status push API.", err);
+                    meta.code = 404;
+                    meta.error = "Error: " + err;
+                    meta.data_property_name = "";
+                    finalData = "Validation Error";
+                }else{
+                        console.log("Status comment successfully added.");
+                        meta.code = 200;
+                        meta.data_property_name = "data";
+                        meta.error = "";
+                        finalData = result;
+                }
+                var json = JSON.stringify({
+                    'meta': meta,
+                    'data': finalData
+                });
+                res.send(json);
+
+            });
         }
-        var json = JSON.stringify({
-            'meta': meta,
-            'data': finalData
-        });
-        res.send(json);
     });
 });
 
@@ -92,6 +104,31 @@ router.get('/retrieve/:commentId', function(req, res, next){
         res.send(json);
     });
 });
+
+//localhost:3000/api/comment/update/:commentId
+router.put('/update/:commentId', function(req, res, next){
+    Comment.update({'_id':req.params.commentId}, req.body, {safe: true}, function(error, result) {
+        if (error) {
+            console.log("> Getting Error in comment/update/:commentId.", error);
+            Meta.code = 404;
+            Meta.error = "Error: " + error;
+            Meta.data_property_name = "";
+            FinalData = "No record found for this commentId.";
+        } else {
+            Meta.code = 200;
+            Meta.error = "";
+            Meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': Meta,
+            'data': FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+
 //localhost:3000/api/comment/delete/:statusId
 router.delete('/delete/:commentId', function(req, res, next){
     Comment.remove({_id: req.params.commentId}, function(error, result){
@@ -120,11 +157,7 @@ router.delete('/delete/:commentId', function(req, res, next){
 
 router.post('/add-comment-like', function (req, res, next) {
 
-    /*console.log("------>data 2= ", req.body);
-    console.log("Email is ", req.body.email);
-    console.log("reqQuery - >", req.query);
-    res.send(req.body.email);*/
-    var collection = new comment({
+    var collection = new CommentLike({
         comment_id: req.body.comment_id,
         user_id: req.body.user_id
     });
@@ -143,8 +176,6 @@ router.post('/add-comment-like', function (req, res, next) {
             finalData = "";
         }
         else {
-
-            /*Push into status array*/
 
             console.log("Comment-like saved successfully!");
             meta.code = 200;
