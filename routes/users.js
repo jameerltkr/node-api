@@ -24,7 +24,7 @@ router.get('/', function (req, res, next) {
 
 
 //http://localhost:3000/api/users/create
-router.post('/create', function (req, res, next) {
+router.post('/create', roleUser.can("register"), function (req, res, next) {
 
     /*console.log("------>data 2= ", req.body);
     console.log("Email is ", req.body.email);
@@ -68,7 +68,7 @@ router.post('/create', function (req, res, next) {
             Meta.code = 200;
             Meta.data_property_name = "";
             Meta.error = "";
-            FinalData = "User created inserted successfully.";
+            FinalData = "User created successfully.";
         }
         var json = JSON.stringify({
             'meta': Meta,
@@ -103,7 +103,7 @@ router.get('/retrieve', roleUser.can('access owner page'), roleUser.can('access 
     });
 });
 //localhost:3000/api/users/retrieve/:userId
-router.get('/retrieve/:userId', function (req, res, next) {
+router.get('/retrieve/:userId', roleUser.can('access retrieve single data api'), function (req, res, next) {
     User.findOne({ _id: req.params.userId }, function (error, result) {
         if (error) {
             console.log("> Getting Error in users/retrieve/:userId.", error);
