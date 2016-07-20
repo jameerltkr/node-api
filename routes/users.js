@@ -6,6 +6,7 @@ var bCrypt = require('bcrypt-nodejs');
 var Passport = require('passport');
 
 var User = require('../model/user');
+var roleUser = require('../middleware/role-management');
 
 var MiddlewarePassport = require('../middleware/passport');
 var MiddlewareJwt = require('../middleware/jwt');
@@ -71,7 +72,7 @@ router.post('/create', function (req, res, next) {
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data' : FinalData/*,
+            'data': FinalData/*,
             'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
@@ -79,15 +80,15 @@ router.post('/create', function (req, res, next) {
 });
 
 //localhost:3000/api/users/retrieve
-router.get('/retrieve', function(req, res, next){
-    User.find({}, function(error, result){
-        if(error){
-            console.log("> Getting Error in users/retrieve.",error);
+router.get('/retrieve', roleUser.can('access owner page'), roleUser.can('access admin page'), roleUser.can('access private page'), function (req, res, next) {
+    User.find({}, function (error, result) {
+        if (error) {
+            console.log("> Getting Error in users/retrieve.", error);
             Meta.code = 404;
-            Meta.error = "Error: "+error;
+            Meta.error = "Error: " + error;
             Meta.data_property_name = "";
             FinalData = "";
-        }else{
+        } else {
             Meta.code = 200;
             Meta.error = "";
             Meta.data_property_name = "data";
@@ -95,22 +96,22 @@ router.get('/retrieve', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data' : FinalData/*,
+            'data': FinalData/*,
             'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
     });
 });
 //localhost:3000/api/users/retrieve/:userId
-router.get('/retrieve/:userId', function(req, res, next){
-    User.findOne({_id: req.params.userId}, function(error, result){
-        if(error){
-            console.log("> Getting Error in users/retrieve/:userId.",error);
+router.get('/retrieve/:userId', function (req, res, next) {
+    User.findOne({ _id: req.params.userId }, function (error, result) {
+        if (error) {
+            console.log("> Getting Error in users/retrieve/:userId.", error);
             Meta.code = 404;
-            Meta.error = "Error: "+error;
+            Meta.error = "Error: " + error;
             Meta.data_property_name = "";
             FinalData = "No record found for this userId.";
-        }else{
+        } else {
             Meta.code = 200;
             Meta.error = "";
             Meta.data_property_name = "data";
@@ -118,22 +119,22 @@ router.get('/retrieve/:userId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data' : FinalData/*,
+            'data': FinalData/*,
             'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
     });
 });
 //localhost:3000/api/users/retrieve/:userId
-router.delete('/delete/:userId', function(req, res, next){
-    User.remove({_id: req.params.userId}, function(error, result){
-        if(error){
-            console.log("> Getting Error in users/delete/:userId.",error);
+router.delete('/delete/:userId', function (req, res, next) {
+    User.remove({ _id: req.params.userId }, function (error, result) {
+        if (error) {
+            console.log("> Getting Error in users/delete/:userId.", error);
             Meta.code = 404;
-            Meta.error = "Error: "+error;
+            Meta.error = "Error: " + error;
             Meta.data_property_name = "";
             FinalData = "No record found for this userId.";
-        }else{
+        } else {
             Meta.code = 200;
             Meta.error = "";
             Meta.data_property_name = "data";
@@ -141,7 +142,7 @@ router.delete('/delete/:userId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data' : FinalData/*,
+            'data': FinalData/*,
             'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
@@ -153,7 +154,7 @@ router.delete('/delete/:userId', function(req, res, next){
 
 router.get('/login',
     Passport.authenticate('login'),
-    function(req, res, next) {
+    function (req, res, next) {
         res.send('Request is authenticated against JWT.');
     });
 

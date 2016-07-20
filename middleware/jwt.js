@@ -23,27 +23,30 @@ var Auth = function (req, res, next) {
         // verifies secret and checks exp
         Jwt.verify(token, Config.secret, function (err, decoded) {
             if (err) {
+                req.logout();
                 return res.json({ success: false, message: 'Failed to authenticate token.' });
             } else {
                 // if everything is good, save to request for use in other routes
 
-				// get the decoded payload and header
-				var decoded = Jwt.decode(token, {complete: true});
-				var user = decoded.payload._doc;	// Get the user from JWT Token
-				
-				req.login(user, function (errr) {
-					if(errr){
-						return res.json({ success: false, message: 'Failed to authenticate user.' });
-					}else{				
-						req.decoded = decoded;
-						next();
-					}
-				});	// Log In the user using Passport Authentication
-				
+                // get the decoded payload and header
+                var decodedData = Jwt.decode(token, { complete: true });
+                var user = decodedData.payload._doc;	// Get the user from JWT Token
+
+                req.login(user, function (errr) {
+                    if (errr) {
+                        req.logout();
+                        return res.json({ success: false, message: 'Failed to authenticate user.' });
+                    } else {
+                        req.decoded = decoded;
+                        next();
+                    }
+                });	// Log In the user using Passport Authentication
+
             }
         });
 
     } else {
+        req.logout();
 
         // if there is no token
         // return an error
