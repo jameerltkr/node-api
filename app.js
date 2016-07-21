@@ -7,12 +7,11 @@ var multipart = require('connect-multiparty');
 var bodyParser = require('body-parser');
 
 var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
 
 var roleManagement = require('./middleware/role-management');
 
-var mydb = require('./model/DB');
 var routes = require('./routes/index');
+var authentication = require('./routes/authentication');
 var users = require('./routes/users');
 var status = require('./routes/status');
 var comment = require('./routes/comment');
@@ -21,7 +20,6 @@ var report = require('./routes/report');
 var User = require('./model/user');
 var app = express();
 
-var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./bin/config'); // get our config file
 
 // view engine setup
@@ -57,6 +55,7 @@ passport.deserializeUser(function (id, done) {
 });
 
 app.use('/api', routes);
+app.use('/api/auth', authentication);
 app.use('/api/users', users);
 app.use('/api/status', status);
 app.use('/api/comment', comment);

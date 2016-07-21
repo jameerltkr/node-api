@@ -75,8 +75,7 @@ router.get('/retrieve', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data' : FinalData
         });
         res.send(json);
     });
@@ -98,8 +97,7 @@ router.get('/retrieve/:commentId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data' : FinalData
         });
         res.send(json);
     });
@@ -122,8 +120,7 @@ router.put('/update/:commentId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data': FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
@@ -146,8 +143,7 @@ router.delete('/delete/:commentId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data' : FinalData
         });
         res.send(json);
     });

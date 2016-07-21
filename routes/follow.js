@@ -62,8 +62,7 @@ router.get('/retrieve', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data' : FinalData
         });
         res.send(json);
     });
@@ -85,8 +84,7 @@ router.get('/retrieve/:followId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data' : FinalData
         });
         res.send(json);
     });
@@ -110,8 +108,7 @@ router.put('/update/:followId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data': FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
@@ -134,8 +131,7 @@ router.delete('/delete/:followId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data' : FinalData
         });
         res.send(json);
     });

@@ -1,10 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-var bCrypt = require('bcrypt-nodejs');
-
-var Passport = require('passport');
-
 var User = require('../model/user');
 var roleUser = require('../middleware/role-management');
 
@@ -18,13 +14,11 @@ var FinalData = {};
 /* GET users listing. */
 router.get('/', function (req, res, next) {
     console.log(req.isAuthenticated());
-    console.log(req.user.role);
     res.send('respond with a resource');
 });
 
-
-//http://localhost:3000/api/users/create
-router.post('/create', roleUser.can("register"), function (req, res, next) {
+//http://localhost:3000/api/users/signup
+router.post('/signup', roleUser.can("register"), function (req, res, next) {
 
     var userPassword = MiddlewarePassport.CreateHash(req.body.password);
 
@@ -67,8 +61,8 @@ router.post('/create', roleUser.can("register"), function (req, res, next) {
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data': FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData,
+            'token': MiddlewareJwt.GenerateToken(result)
         });
         res.send(json);
     });
@@ -91,8 +85,7 @@ router.get('/retrieve', roleUser.can('access owner page'), roleUser.can('access 
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data': FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
@@ -114,8 +107,7 @@ router.get('/retrieve/:userId', roleUser.can('access retrieve single data api'),
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data': FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
@@ -138,16 +130,13 @@ router.put('/update/:userId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data': FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
 })
 
-
-
-//localhost:3000/api/users/retrieve/:userId
+//localhost:3000/api/users/delete/:userId
 router.delete('/delete/:userId', function (req, res, next) {
     User.remove({ _id: req.params.userId }, function (error, result) {
         if (error) {
@@ -164,59 +153,11 @@ router.delete('/delete/:userId', function (req, res, next) {
         }
         var json = JSON.stringify({
             'meta': Meta,
-            'data': FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
 });
 
-
-
-
-router.get('/login',
-    Passport.authenticate('login'),
-    function (req, res, next) {
-        res.send('Request is authenticated against JWT.');
-    });
-
-router.post('/authenticate', function (req, res, next) {
-
-    // find the user
-    User.findOne({
-        name: req.body.name
-    }, function (err, user) {
-
-        console.log(user);
-
-        if (err) throw err;
-
-        if (!user) {
-            res.json({ success: false, message: 'Authentication failed. User not found.' });
-        } else if (user) {
-
-            // check if password matches
-            if (user.password != req.body.password) {
-                res.json({ success: false, message: 'Authentication failed. Wrong password.' });
-            } else {
-
-                // if user is found and password is right
-                // create a token
-                var token = jwt.sign(user, Config.secret, {
-                    expiresIn: 60 * 60 * 24 // expires in 24 hours
-                });
-
-                // return the information including token as JSON
-                res.json({
-                    success: true,
-                    message: 'Enjoy your token!',
-                    token: token
-                });
-            }
-
-        }
-
-    });
-});
 
 module.exports = router;
