@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 
 var passport = require('passport');
 
+var myDB = require('./model/DB');
+
 var roleManagement = require('./middleware/role-management');
 
 var routes = require('./routes/index');

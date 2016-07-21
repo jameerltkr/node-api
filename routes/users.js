@@ -69,7 +69,7 @@ router.post('/signup', roleUser.can("register"), function (req, res, next) {
 });
 
 //localhost:3000/api/users/retrieve
-router.get('/retrieve', roleUser.can('access owner page'), roleUser.can('access admin page'), roleUser.can('access private page'), function (req, res, next) {
+router.get('/retrieve', roleUser.can('access all'), function (req, res, next) {
     User.find({}, function (error, result) {
         if (error) {
             console.log("> Getting Error in users/retrieve.", error);
@@ -90,8 +90,9 @@ router.get('/retrieve', roleUser.can('access owner page'), roleUser.can('access 
         res.send(json);
     });
 });
+
 //localhost:3000/api/users/retrieve/:userId
-router.get('/retrieve/:userId', roleUser.can('access retrieve single data api'), function (req, res, next) {
+router.get('/retrieve/:userId', roleUser.can('retrieve user'), function (req, res, next) {
     User.findOne({ _id: req.params.userId }, function (error, result) {
         if (error) {
             console.log("> Getting Error in users/retrieve/:userId.", error);
@@ -114,7 +115,7 @@ router.get('/retrieve/:userId', roleUser.can('access retrieve single data api'),
 });
 
 //localhost:3000/api/users/update/:userId
-router.put('/update/:userId', function(req, res, next){
+router.put('/update/:userId', roleUser.can('update user'), function(req, res, next){
     User.update({'_id':req.params.userId}, req.body, {safe: true}, function(error, result) {
         if (error) {
             console.log("> Getting Error in users/update/:userId.", error);
@@ -137,7 +138,7 @@ router.put('/update/:userId', function(req, res, next){
 })
 
 //localhost:3000/api/users/delete/:userId
-router.delete('/delete/:userId', function (req, res, next) {
+router.delete('/delete/:userId', roleUser.can('delete user'), function (req, res, next) {
     User.remove({ _id: req.params.userId }, function (error, result) {
         if (error) {
             console.log("> Getting Error in users/delete/:userId.", error);
@@ -158,6 +159,5 @@ router.delete('/delete/:userId', function (req, res, next) {
         res.send(json);
     });
 });
-
 
 module.exports = router;

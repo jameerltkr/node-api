@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Comment = require('../model/comment');
 var CommentLike = require('../model/comment-like');
+var roleUser = require('../middleware/role-management');
 var Status = require('../model/status');
 var meta = { code: Number, data_property_name: String, error: String };
 var finalData = {};
@@ -10,7 +11,7 @@ router.get('/', function (req, res, next) {
     res.render('index', { title: 'Express' });
 });
 
-router.post('/comment/create', function (req, res, next) {
+router.post('/comment/create', roleUser.can("create"), function (req, res, next) {
 
     var collection = new Comment({
         text: req.body.text,
