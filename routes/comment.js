@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var Comment = require('../model/comment');
 var CommentLike = require('../model/comment-like');
-var roleUser = require('../middleware/role-management');
 var Status = require('../model/status');
 var meta = { code: Number, data_property_name: String, error: String };
 var finalData = {};
@@ -11,7 +10,8 @@ router.get('/', function (req, res, next) {
     res.render('index', { title: 'Express' });
 });
 
-router.post('/comment/create', roleUser.can("create"), function (req, res, next) {
+//localhost:3000/api/comment/create
+router.post('/create', function (req, res, next) {
 
     var collection = new Comment({
         text: req.body.text,
@@ -61,44 +61,110 @@ router.post('/comment/create', roleUser.can("create"), function (req, res, next)
 
 //localhost:3000/api/comment/retrieve
 router.get('/retrieve', function(req, res, next){
-    Comment.find({}, function(error, result){
+    Comment.find({})
+    .populate('status_id')
+    .populate('user_id')
+    .exec(function(error, result){
         if(error){
             console.log("> Getting Error in comment/retrieve.", error);
-            Meta.code = 404;
-            Meta.error = "Error: "+error;
-            Meta.data_property_name = "";
+            meta.code = 404;
+            meta.error = "Error: "+error;
+            meta.data_property_name = "";
             FinalData = "";
         }else{
-            Meta.code = 200;
-            Meta.error = "";
-            Meta.data_property_name = "data";
+            meta.code = 200;
+            meta.error = "";
+            meta.data_property_name = "data";
             FinalData = result;
         }
         var json = JSON.stringify({
-            'meta': Meta,
-            'data' : FinalData
+            'meta': meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
     });
 });
+
+
+
 //localhost:3000/api/comment/retrieve/:commentId
 router.get('/retrieve/:commentId', function(req, res, next){
-    Comment.findOne({_id: req.params.commentId}, function(error, result){
+    Comment.findOne({_id: req.params.commentId})
+    .populate('status_id')
+    .populate('user_id')
+    .exec(function(error, result){
         if(error){
             console.log("> Getting Error in comment/retrieve/:commentId.",error);
-            Meta.code = 404;
-            Meta.error = "Error: "+error;
-            Meta.data_property_name = "";
+            meta.code = 404;
+            meta.error = "Error: "+error;
+            meta.data_property_name = "";
             FinalData = "No record found for this commentId.";
         }else{
-            Meta.code = 200;
-            Meta.error = "";
-            Meta.data_property_name = "data";
+            meta.code = 200;
+            meta.error = "";
+            meta.data_property_name = "data";
             FinalData = result;
         }
         var json = JSON.stringify({
-            'meta': Meta,
-            'data' : FinalData
+            'meta': meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+
+
+//localhost:3000/api/comment/retrieve-by-user/:userId
+router.get('/retrieve-by-user/:userId', function(req, res, next){
+    Comment.findOne({user_id: req.params.userId})
+    .populate('status_id')
+    .populate('user_id')
+    .exec(function(error, result){
+        if(error){
+            console.log("> Getting Error in comment/retrieve-by-user/:userId.",error);
+            meta.code = 404;
+            meta.error = "Error: "+error;
+            meta.data_property_name = "";
+            FinalData = "No record found for this userId.";
+        }else{
+            meta.code = 200;
+            meta.error = "";
+            meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
+        });
+        res.send(json);
+    });
+});
+
+//localhost:3000/api/comment/retrieve-by-status/:status_id
+router.get('/retrieve-by-status/:status_id', function(req, res, next){
+    Comment.findOne({status_id: req.params.status_id})
+    .populate('status_id')
+    .populate('user_id')
+    .exec(function(error, result){
+        if(error){
+            console.log("> Getting Error in comment/retrieve-by-status/:status_id.",error);
+            meta.code = 404;
+            meta.error = "Error: "+error;
+            meta.data_property_name = "";
+            FinalData = "No record found for this status_id.";
+        }else{
+            meta.code = 200;
+            meta.error = "";
+            meta.data_property_name = "data";
+            FinalData = result;
+        }
+        var json = JSON.stringify({
+            'meta': meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
     });
@@ -109,19 +175,20 @@ router.put('/update/:commentId', function(req, res, next){
     Comment.update({'_id':req.params.commentId}, req.body, {safe: true}, function(error, result) {
         if (error) {
             console.log("> Getting Error in comment/update/:commentId.", error);
-            Meta.code = 404;
-            Meta.error = "Error: " + error;
-            Meta.data_property_name = "";
+            meta.code = 404;
+            meta.error = "Error: " + error;
+            meta.data_property_name = "";
             FinalData = "No record found for this commentId.";
         } else {
-            Meta.code = 200;
-            Meta.error = "";
-            Meta.data_property_name = "data";
+            meta.code = 200;
+            meta.error = "";
+            meta.data_property_name = "data";
             FinalData = result;
         }
         var json = JSON.stringify({
-            'meta': Meta,
-            'data': FinalData
+            'meta': meta,
+            'data': FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
     });
@@ -132,24 +199,24 @@ router.delete('/delete/:commentId', function(req, res, next){
     Comment.remove({_id: req.params.commentId}, function(error, result){
         if(error){
             console.log("> Getting Error in comment/delete/:commentId.",error);
-            Meta.code = 404;
-            Meta.error = "Error: "+error;
-            Meta.data_property_name = "";
+            meta.code = 404;
+            meta.error = "Error: "+error;
+            meta.data_property_name = "";
             FinalData = "No record found for this commentId.";
         }else{
-            Meta.code = 200;
-            Meta.error = "";
-            Meta.data_property_name = "data";
+            meta.code = 200;
+            meta.error = "";
+            meta.data_property_name = "data";
             FinalData = result;
         }
         var json = JSON.stringify({
-            'meta': Meta,
-            'data' : FinalData
+            'meta': meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
     });
 });
-
 
 
 router.post('/add-comment-like', function (req, res, next) {

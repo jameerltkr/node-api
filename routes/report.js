@@ -8,11 +8,12 @@ router.get('/', function (req, res, next) {
     res.render('index', { title: 'Express' });
 });
 
+//localhost:3000/api/report/create
 router.post('/create', function (req, res, next) {
 
     var collection = new Report({
         alleged_id: req.body.alleged_id,
-        type: req.body.type,
+        report_type: req.body.report_type,
         description: req.body.description
     });
 
@@ -46,44 +47,51 @@ router.post('/create', function (req, res, next) {
 
 //localhost:3000/api/report/retrieve
 router.get('/retrieve', function(req, res, next){
-    Report.find({}, function(error, result){
+    Report.find({})
+    .populate('alleged_id')
+    .exec(function(error, result){
         if(error){
             console.log("> Getting Error in report/retrieve.",error);
-            Meta.code = 404;
-            Meta.error = "Error: "+error;
-            Meta.data_property_name = "";
+            meta.code = 404;
+            meta.error = "Error: "+error;
+            meta.data_property_name = "";
             FinalData = "";
         }else{
-            Meta.code = 200;
-            Meta.error = "";
-            Meta.data_property_name = "data";
+            meta.code = 200;
+            meta.error = "";
+            meta.data_property_name = "data";
             FinalData = result;
         }
         var json = JSON.stringify({
-            'meta': Meta,
-            'data' : FinalData
+            'meta': meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
     });
 });
-//localhost:3000/api/report/retrieve/:statusId
+
+//localhost:3000/api/report/retrieve/:reportId
 router.get('/retrieve/:reportId', function(req, res, next){
-    Report.findOne({_id: req.params.reportId}, function(error, result){
+    Report.findOne({_id: req.params.reportId})
+    .populate('alleged_id')
+    .exec(function(error, result){
         if(error){
             console.log("> Getting Error in report/retrieve/:reportId.",error);
-            Meta.code = 404;
-            Meta.error = "Error: "+error;
-            Meta.data_property_name = "";
+            meta.code = 404;
+            meta.error = "Error: "+error;
+            meta.data_property_name = "";
             FinalData = "No record found for this reportId.";
         }else{
-            Meta.code = 200;
-            Meta.error = "";
-            Meta.data_property_name = "data";
+            meta.code = 200;
+            meta.error = "";
+            meta.data_property_name = "data";
             FinalData = result;
         }
         var json = JSON.stringify({
-            'meta': Meta,
-            'data' : FinalData
+            'meta': meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
     });
@@ -95,19 +103,20 @@ router.put('/update/:reportId', function(req, res, next){
     Report.update({'_id':req.params.reportId}, req.body, {safe: true}, function(error, result) {
         if (error) {
             console.log("> Getting Error in report/update/:reportId.", error);
-            Meta.code = 404;
-            Meta.error = "Error: " + error;
-            Meta.data_property_name = "";
+            meta.code = 404;
+            meta.error = "Error: " + error;
+            meta.data_property_name = "";
             FinalData = "No record found for this reportId.";
         } else {
-            Meta.code = 200;
-            Meta.error = "";
-            Meta.data_property_name = "data";
+            meta.code = 200;
+            meta.error = "";
+            meta.data_property_name = "data";
             FinalData = result;
         }
         var json = JSON.stringify({
-            'meta': Meta,
-            'data': FinalData
+            'meta': meta,
+            'data': FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
     });
@@ -117,19 +126,20 @@ router.delete('/delete/:reportId', function(req, res, next){
     Report.remove({_id: req.params.reportId}, function(error, result){
         if(error){
             console.log("> Getting Error in report/delete/:reportId.",error);
-            Meta.code = 404;
-            Meta.error = "Error: "+error;
-            Meta.data_property_name = "";
+            meta.code = 404;
+            meta.error = "Error: "+error;
+            meta.data_property_name = "";
             FinalData = "No record found for this reportId.";
         }else{
-            Meta.code = 200;
-            Meta.error = "";
-            Meta.data_property_name = "data";
+            meta.code = 200;
+            meta.error = "";
+            meta.data_property_name = "data";
             FinalData = result;
         }
         var json = JSON.stringify({
-            'meta': Meta,
-            'data' : FinalData
+            'meta': meta,
+            'data' : FinalData/*,
+            'token': MiddlewareJwt.GenerateToken(result)*/
         });
         res.send(json);
     });
