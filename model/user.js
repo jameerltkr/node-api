@@ -15,11 +15,7 @@ var UserSchema = new Schema({
     bio: { type: String },
     phone_number: { type: Number },
     gender: { type: String },
-    profile_pic:
-	{
-	    data: { type: Buffer },
-	    contentType: { type: String }
-	},
+    profile_pic: { type: String },
     password: {
         type: String,
         //required: 'Password for user is required!',

@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
-
+var multipart = require('connect-multiparty');
+var multipartMiddleware = multipart();
+var fs = require('fs');
 var User = require('../model/user');
 var roleUser = require('../middleware/role-management');
 
@@ -17,55 +19,54 @@ router.get('/', function (req, res, next) {
     res.send('respond with a resource');
 });
 
-//http://localhost:3000/api/users/signup
-router.post('/signup', roleUser.can("register"), function (req, res, next) {
+//http://localhost:3000/api/users/create
+router.post('/create', roleUser.can("register"), multipartMiddleware, function (req, res, next) {
 
     var userPassword = MiddlewarePassport.CreateHash(req.body.password);
 
-    var collection = new User({
-        email: req.body.email,
-        name: req.body.name,
-        username: req.body.username,
-        website: req.body.website,
-        bio: req.body.bio,
-        phone_number: req.body.phone_number,
-        gender: req.body.gender,
-        /*profile_pic:  
-        {
-          data: "data:image/png;base64,"+(fs.readFileSync(req.files.profile_pic.path)).toString('base64'), 
-          contentType : 'image/png'
-        },*/
-        password: userPassword,
-        role: req.body.role
-    });
-
-    collection.save(function (error, result) {
-        if (error) {
-            console.log("Getting ERROR in users/add API.", error);
-
-            if (error.name == 'ValidationError') {
-                Meta.error = "Error: Validation Error.";
-            } else {
-                Meta.error = "Error: " + error;
-            }
-            Meta.code = 404;
-            Meta.data_property_name = "";
-            FinalData = error;
-        }
-        else {
-            console.log("User saved successfully!");
-            Meta.code = 200;
-            Meta.data_property_name = "";
-            Meta.error = "";
-            FinalData = result;
-        }
-        var json = JSON.stringify({
-            'meta': Meta,
-            'data': FinalData,
-            'token': MiddlewareJwt.GenerateToken(result)
+    uploadImage(req.files.profile_pic, function(uploadedImagePath){
+        var collection = new User({
+            email: req.body.email,
+            name: req.body.name,
+            username: req.body.username,
+            website: req.body.website,
+            bio: req.body.bio,
+            phone_number: req.body.phone_number,
+            gender: req.body.gender,
+            profile_pic: uploadedImagePath,
+            password: userPassword,
+            role: req.body.role
         });
-        res.send(json);
-    });
+
+        collection.save(function (error, result) {
+            if (error) {
+                console.log("Getting ERROR in users/create API.", error);
+
+                if (error.name == 'ValidationError') {
+                    Meta.error = "Error: Validation Error.";
+                } else {
+                    Meta.error = "Error: " + error;
+                }
+                Meta.code = 404;
+                Meta.data_property_name = "";
+                FinalData = error;
+            }
+            else {
+                console.log("User saved successfully!");
+                Meta.code = 200;
+                Meta.data_property_name = "";
+                Meta.error = "";
+                FinalData = result;
+            }
+            var json = JSON.stringify({
+                'meta': Meta,
+                'data': FinalData/*,
+                'token': MiddlewareJwt.GenerateToken(result)*/
+            });
+            res.send(json);
+        });    
+    })   
+    
 });
 
 //localhost:3000/api/users/retrieve
@@ -159,5 +160,33 @@ router.delete('/delete/:userId', roleUser.can('delete user'), function (req, res
         res.send(json);
     });
 });
+
+function uploadImage(imageFile, callback){
+    fs.readFile(imageFile.path, function (err, data)
+    {
+        imageName = imageFile.name;
+        if(imageName && imageName != "" )
+        {
+            imageName = imageName.replace('.png', "");
+            imageName = imageName + '_' + Math.floor(Math.random()*(10000000-1)+21) + '.png';
+        }
+        
+        if(!imageName)
+        {
+            callback(imageName);
+        }
+        else
+        {
+            newPath = "public/images/profilePics/"+imageName;
+            /// write file to public/images/profilePics/ directory
+            fs.writeFile(newPath, data, function (err) {
+                //Deleting main uploaded file.
+                fs.unlink(imageFile.path, function (error){
+                    callback(imageName);
+                });
+            });
+        }
+    });
+}
 
 module.exports = router;
