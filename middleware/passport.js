@@ -2,6 +2,7 @@
 
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var User = require('../model/user');
 var bCrypt = require('bcrypt-nodejs');
 
@@ -9,6 +10,9 @@ var Jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 
 var Config = require('../bin/config');
 
+//======================================================================//
+//==================== Passport Local Login ============================//
+//======================================================================//
 passport.use('login', new LocalStrategy({
     passReqToCallback: true
 },
@@ -56,7 +60,7 @@ passport.use('login', new LocalStrategy({
         }
       );
   }));
-  
+
 
 // User Signup
 passport.use('signup', new LocalStrategy({
@@ -104,6 +108,26 @@ passport.use('signup', new LocalStrategy({
       // the method in the next tick of the event loop
       process.nextTick(findOrCreateUser);
   }));
+
+//======================================================================//
+//=================== Passport Google Auth =============================//
+//======================================================================//
+passport.use('login-google', new GoogleStrategy({
+    clientID: '402166863300-ullhvi45ckloelig76o5is28nuif38gt.apps.googleusercontent.com',
+    clientSecret: 'ytt2tWh62YecK_M_H9b6WSUO',
+    callbackURL: "http://localhost:3000/auth/google/callback"
+},
+  function (accessToken, refreshToken, profile, done) {
+      console.log('ID: ' + profile.id);
+      console.log('Name: ' + profile.displayName);
+      console.log('Email : ' + profile.emails[0].value);
+      return done(null, profile);
+  }
+));
+
+//======================================================================//
+//=================== Passport Facebook Auth ===========================//
+//======================================================================//
 
 var IsValidPassword = function (user, password) {
     return bCrypt.compareSync(password, user.password);

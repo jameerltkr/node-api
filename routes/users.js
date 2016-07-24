@@ -115,8 +115,8 @@ router.get('/retrieve/:userId', roleUser.can('retrieve user'), function (req, re
 });
 
 //localhost:3000/api/users/update/:userId
-router.put('/update/:userId', roleUser.can('update user'), function(req, res, next){
-    User.update({'_id':req.params.userId}, req.body, {safe: true}, function(error, result) {
+router.put('/update/:userId', roleUser.can('update user'), function (req, res, next) {
+    User.update({ '_id': req.params.userId }, req.body, { safe: true }, function (error, result) {
         if (error) {
             console.log("> Getting Error in users/update/:userId.", error);
             Meta.code = 404;

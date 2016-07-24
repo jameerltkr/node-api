@@ -25,8 +25,8 @@ var app = express();
 var config = require('./bin/config'); // get our config file
 
 var ErrorLog = {
-	Status: Number,
-	Message: String
+    Status: Number,
+    Message: String
 };
 
 // view engine setup
@@ -74,10 +74,10 @@ app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     //next(err);
-	console.log(err);
-	ErrorLog.Status = err.status;
-	ErrorLog.Message = 'The API you are looking for is not found.';
-	res.send(ErrorLog);
+    console.log(err);
+    ErrorLog.Status = err.status;
+    ErrorLog.Message = 'The API you are looking for is not found.';
+    res.send(ErrorLog);
 });
 
 // error handlers
@@ -87,15 +87,15 @@ app.use(function (req, res, next) {
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
-		/*
+        /*
         res.render('error', {
             message: err.message,
             error: err
         });
 		*/
-		ErrorLog.Status = err.status;
-		ErrorLog.Message = err.message;
-		res.send(ErrorLog);
+        ErrorLog.Status = err.status;
+        ErrorLog.Message = err.message;
+        res.send(ErrorLog);
     });
 }
 
@@ -103,15 +103,15 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
     res.status(err.status || 500);
-	/*
+    /*
     res.render('error', {
         message: err.message,
         error: {}
     });
 	*/
-	ErrorLog.Status = err.status;
-	ErrorLog.Message = '';
-	res.send(ErrorLog);
+    ErrorLog.Status = err.status;
+    ErrorLog.Message = '';
+    res.send(ErrorLog);
 });
 
 module.exports = app;

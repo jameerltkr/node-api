@@ -47,18 +47,18 @@ router.post('/create', function (req, res, next) {
 });
 
 //localhost:3000/api/follow/retrieve
-router.get('/retrieve', function(req, res, next){
+router.get('/retrieve', function (req, res, next) {
     Follow.find({})
     .populate('follower_id')
     .populate('following_id')
-    .exec(function(error, result){
-        if(error){
+    .exec(function (error, result) {
+        if (error) {
             console.log("> Getting Error in follow/retrieve.", error);
             meta.code = 404;
-            meta.error = "Error: "+error;
+            meta.error = "Error: " + error;
             meta.data_property_name = "";
             FinalData = "";
-        }else{
+        } else {
             meta.code = 200;
             meta.error = "";
             meta.data_property_name = "data";
@@ -66,25 +66,24 @@ router.get('/retrieve', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
 });
 //localhost:3000/api/follow/retrieve/:statusId
-router.get('/retrieve/:followId', function(req, res, next){
-    Follow.findOne({_id: req.params.followId})
+router.get('/retrieve/:followId', function (req, res, next) {
+    Follow.findOne({ _id: req.params.followId })
     .populate('follower_id')
     .populate('following_id')
-    .exec(function(error, result){
-        if(error){
-            console.log("> Getting Error in follow/retrieve/:followId.",error);
+    .exec(function (error, result) {
+        if (error) {
+            console.log("> Getting Error in follow/retrieve/:followId.", error);
             meta.code = 404;
-            meta.error = "Error: "+error;
+            meta.error = "Error: " + error;
             meta.data_property_name = "";
             FinalData = "No record found for this followId.";
-        }else{
+        } else {
             meta.code = 200;
             meta.error = "";
             meta.data_property_name = "data";
@@ -92,8 +91,7 @@ router.get('/retrieve/:followId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
@@ -101,8 +99,8 @@ router.get('/retrieve/:followId', function(req, res, next){
 
 
 //localhost:3000/api/follow/update/:followId
-router.put('/update/:followId', function(req, res, next){
-    Follow.update({'_id':req.params.followId}, req.body, {safe: true}, function(error, result) {
+router.put('/update/:followId', function (req, res, next) {
+    Follow.update({ '_id': req.params.followId }, req.body, { safe: true }, function (error, result) {
         if (error) {
             console.log("> Getting Error in follow/update/:followId.", error);
             meta.code = 404;
@@ -117,23 +115,22 @@ router.put('/update/:followId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': meta,
-            'data': FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
 });
 
 //localhost:3000/api/follow/delete/:statusId
-router.delete('/delete/:followId', function(req, res, next){
-    Follow.remove({_id: req.params.followId}, function(error, result){
-        if(error){
-            console.log("> Getting Error in follow/delete/:followId.",error);
+router.delete('/delete/:followId', function (req, res, next) {
+    Follow.remove({ _id: req.params.followId }, function (error, result) {
+        if (error) {
+            console.log("> Getting Error in follow/delete/:followId.", error);
             meta.code = 404;
-            meta.error = "Error: "+error;
+            meta.error = "Error: " + error;
             meta.data_property_name = "";
             FinalData = "No record found for this followId.";
-        }else{
+        } else {
             meta.code = 200;
             meta.error = "";
             meta.data_property_name = "data";
@@ -141,8 +138,7 @@ router.delete('/delete/:followId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });

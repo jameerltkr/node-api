@@ -31,43 +31,43 @@ User.use('access owner api',
         }
     });
 
-	
+
 // Allow Retrieve All to Owner, Moderator and Admin
 User.use('access all', '/retrieve', function (req) {
-  if (req.user.role == 'owner' || req.user.role == 'admin' || req.user.role === 'moderator'){
-	  return true;
-  }
+    if (req.user.role == 'owner' || req.user.role == 'admin' || req.user.role === 'moderator') {
+        return true;
+    }
 });
-	
+
 // Allow Retrieve User to Owner, Moderator, Admin and themselves
 User.use('retrieve user', '/retrieve/:userId', function (req) {
-  if (req.user.role == 'owner' || req.user.role == 'admin' || req.user.role === 'moderator' || req.params.userId == req.user._id){
-	  return true;
-  }
+    if (req.user.role == 'owner' || req.user.role == 'admin' || req.user.role === 'moderator' || req.params.userId == req.user._id) {
+        return true;
+    }
 });
 
 // Allow Update User to Owner, Moderator, Admin and themselves
 User.use('update user', '/update/:userId', function (req) {
-  if (req.user.role == 'owner' || req.user.role == 'admin'|| req.user.role === 'moderator' || req.params.userId == req.user._id){
-	  return true;
-  } 
+    if (req.user.role == 'owner' || req.user.role == 'admin' || req.user.role === 'moderator' || req.params.userId == req.user._id) {
+        return true;
+    }
 });
 
 // Allow Delete User to Owner, Admin and themselves
 User.use('delete user', '/delete/:userId', function (req) {
-  if (req.user.role == 'owner' || req.user.role == 'admin' || req.params.userId == req.user._id){
-	  return true;
-  } 
+    if (req.user.role == 'owner' || req.user.role == 'admin' || req.params.userId == req.user._id) {
+        return true;
+    }
 });
 
 // Allow Retrieve of Comments, Likes Etc to Owner, Moderator, Admin and themselves
 User.use('retrieve', '/retrieve-by-user/:userId', function (req) {
-  if (req.user.role == 'owner' || req.user.role == 'admin' || req.user.role === 'moderator' || req.params.userId == req.user._id){
-	  return true;
-  }
+    if (req.user.role == 'owner' || req.user.role == 'admin' || req.user.role === 'moderator' || req.params.userId == req.user._id) {
+        return true;
+    }
 });
 
-// Allow Admin user to access all pages 
+// Allow Admin to access all pages 
 User.use(function (req) {
     if (req.user.role === 'admin') {
         return true;

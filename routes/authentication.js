@@ -18,9 +18,15 @@ router.get('/login-passport-local',
     function (req, res, next) {
         res.send('Request is authenticated using Passport Local Authentication.');
     });
-	
+
+router.get('/login-passport-google',
+    Passport.authenticate('login-google', { scope: ['profile', 'email'] }),
+    function (req, res, next) {
+        res.send('Request is authenticated using Passport Local Authentication.');
+    });
+
 router.get('/login-jwt', MiddlewareJwt.Auth, function (req, res, next) {
-	console.log(req.isAuthenticated());
+    console.log(req.isAuthenticated());
     res.send('Request is authenticated using JWT.');
 });
 

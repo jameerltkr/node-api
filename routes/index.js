@@ -12,7 +12,7 @@ router.get('/', roleUser.can('access home api'), function (req, res, next) {
 
 /* GET home page. */
 router.get('/test', MiddlewareJwt.Auth, function (req, res, next) {
-	console.log(req.isAuthenticated());
+    console.log(req.isAuthenticated());
     res.send('test');
 });
 

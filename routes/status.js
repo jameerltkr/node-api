@@ -45,20 +45,20 @@ router.post('/create', function (req, res, next) {
 });
 
 //localhost:3000/api/status/retrieve
-router.get('/retrieve', function(req, res, next){
+router.get('/retrieve', function (req, res, next) {
 
     Status.find({})
     .populate('likes')
     .populate('comments')
     .populate('user_id')
-    .exec(function(error, result){
-        if(error){
-            console.log("> Getting Error in status/retrieve.",error);
+    .exec(function (error, result) {
+        if (error) {
+            console.log("> Getting Error in status/retrieve.", error);
             meta.code = 404;
-            meta.error = "Error: "+error;
+            meta.error = "Error: " + error;
             meta.data_property_name = "";
             FinalData = "";
-        }else{
+        } else {
             meta.code = 200;
             meta.error = "";
             meta.data_property_name = "data";
@@ -66,26 +66,25 @@ router.get('/retrieve', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
 });
 //localhost:3000/api/status/retrieve/:statusId
-router.get('/retrieve/:statusId', function(req, res, next){
-    Status.findOne({_id: req.params.statusId})
+router.get('/retrieve/:statusId', function (req, res, next) {
+    Status.findOne({ _id: req.params.statusId })
     .populate('likes')
     .populate('comments')
     .populate('user_id')
-    .exec(function(error, result){
-        if(error){
-            console.log("> Getting Error in status/retrieve/:statusId.",error);
+    .exec(function (error, result) {
+        if (error) {
+            console.log("> Getting Error in status/retrieve/:statusId.", error);
             meta.code = 404;
-            meta.error = "Error: "+error;
+            meta.error = "Error: " + error;
             meta.data_property_name = "";
             FinalData = "No record found for this statusId.";
-        }else{
+        } else {
             meta.code = 200;
             meta.error = "";
             meta.data_property_name = "data";
@@ -93,16 +92,15 @@ router.get('/retrieve/:statusId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
 });
 
 //localhost:3000/api/status/update/:statusId
-router.put('/update/:statusId', function(req, res, next){
-    Status.update({'_id':req.params.statusId}, req.body, {safe: true}, function(error, result) {
+router.put('/update/:statusId', function (req, res, next) {
+    Status.update({ '_id': req.params.statusId }, req.body, { safe: true }, function (error, result) {
         if (error) {
             console.log("> Getting Error in status/update/:statusId.", error);
             meta.code = 404;
@@ -117,23 +115,22 @@ router.put('/update/:statusId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': meta,
-            'data': FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
 });
 
 //localhost:3000/api/status/delete/:statusId
-router.delete('/delete/:statusId', function(req, res, next){
-    Status.remove({_id: req.params.statusId}, function(error, result){
-        if(error){
-            console.log("> Getting Error in status/delete/:statusId.",error);
+router.delete('/delete/:statusId', function (req, res, next) {
+    Status.remove({ _id: req.params.statusId }, function (error, result) {
+        if (error) {
+            console.log("> Getting Error in status/delete/:statusId.", error);
             meta.code = 404;
-            meta.error = "Error: "+error;
+            meta.error = "Error: " + error;
             meta.data_property_name = "";
             FinalData = "No record found for this statusId.";
-        }else{
+        } else {
             meta.code = 200;
             meta.error = "";
             meta.data_property_name = "data";
@@ -141,8 +138,7 @@ router.delete('/delete/:statusId', function(req, res, next){
         }
         var json = JSON.stringify({
             'meta': meta,
-            'data' : FinalData/*,
-            'token': MiddlewareJwt.GenerateToken(result)*/
+            'data': FinalData
         });
         res.send(json);
     });
@@ -172,19 +168,19 @@ router.post('/like/create', function (req, res, next) {
         }
         else {
             /*push into status table*/
-            Status.update({_id: req.body.status_id}, {$pushAll: {likes:[result._id]}},{upsert:true},function(err, result){
-                if(err){
+            Status.update({ _id: req.body.status_id }, { $pushAll: { likes: [result._id] } }, { upsert: true }, function (err, result) {
+                if (err) {
                     console.log("Getting ERROR in /like/create  API.", err);
                     meta.code = 404;
                     meta.error = "Error: " + err;
                     meta.data_property_name = "";
                     finalData = "Validation Error";
-                }else{
-                        console.log("Status like successfully added.");
-                        meta.code = 200;
-                        meta.data_property_name = "data";
-                        meta.error = "";
-                        finalData = result;
+                } else {
+                    console.log("Status like successfully added.");
+                    meta.code = 200;
+                    meta.data_property_name = "data";
+                    meta.error = "";
+                    finalData = result;
                 }
             });
         }
