@@ -4,6 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var flash = require('connect-flash');
 
 var passport = require('passport');
 
@@ -39,25 +41,30 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(require('express-session')({
-    secret: 'keyboard_blob',
-    resave: false,
-    saveUninitialized: false
-}));
+//app.use(require('express-session')({
+//    secret: 'keyboard_blob',
+//    resave: false,
+//    saveUninitialized: false
+//}));
+
+app.use(session({ secret: config.secret })); // session secret
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash()); // use connect-flash for flash messages stored in session
 app.use(roleManagement.middleware());
 
 app.set('superSecret', config.secret); // secret variable
 
 // passport needs ability to serialize and deserialize users out of session
 passport.serializeUser(function (user, done) {
-    done(null, user._id);
+    //done(null, user._id);
+    done(null, user);
 });
-passport.deserializeUser(function (id, done) {
-    User.findById(id, function (err, user) {
-        done(err, user);
-    });
+passport.deserializeUser(function (obj, done) {
+    //User.findById(id, function (err, user) {
+    //    done(err, user);
+    //});
+    done(null, obj);
 });
 
 app.use('/api', routes);
@@ -73,7 +80,6 @@ app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     //next(err);
-    console.log(err);
     ErrorLog.Status = err.status;
     ErrorLog.Message = 'The API you are looking for is not found.';
     res.send(ErrorLog);

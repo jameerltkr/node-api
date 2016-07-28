@@ -7,11 +7,12 @@ var UserSchema = new Schema({
         type: String,
         required: 'Email for user is required!',
         trim: true,
-        require: true
+        require: true,
+        unique: true
     },
     name: { type: String },
-    username: { type: String, unique: true, require: true },
-    website: { type: String, unique: true },
+    username: { type: String, require: true },
+    website: { type: String },
     bio: { type: String },
     phone_number: { type: Number },
     gender: { type: String },

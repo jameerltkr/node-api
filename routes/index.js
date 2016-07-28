@@ -5,8 +5,9 @@ var MiddlewareJwt = require('../middleware/jwt');
 var roleUser = require('../middleware/role-management');
 
 /* GET home page. */
-router.get('/', roleUser.can('access home api'), function (req, res, next) {
-
+router.get('/', function (req, res, next) {
+    console.log(req.isAuthenticated());
+    console.log(req.user.role);
     res.send('test');
 });
 

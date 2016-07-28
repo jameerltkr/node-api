@@ -24,7 +24,7 @@ router.post('/create', roleUser.can("register"), multipartMiddleware, function (
 
     var userPassword = MiddlewarePassport.CreateHash(req.body.password);
 
-    uploadImage(req.files.profile_pic, function(uploadedImagePath){
+    uploadImage(req.files.profile_pic, function (uploadedImagePath) {
         var collection = new User({
             email: req.body.email,
             name: req.body.name,
@@ -60,13 +60,13 @@ router.post('/create', roleUser.can("register"), multipartMiddleware, function (
             }
             var json = JSON.stringify({
                 'meta': Meta,
-                'data': FinalData/*,
-                'token': MiddlewareJwt.GenerateToken(result)*/
+                'data': FinalData,
+                'token': MiddlewareJwt.GenerateToken(result)
             });
             res.send(json);
-        });    
-    })   
-    
+        });
+    })
+
 });
 
 //localhost:3000/api/users/retrieve
@@ -161,27 +161,23 @@ router.delete('/delete/:userId', roleUser.can('delete user'), function (req, res
     });
 });
 
-function uploadImage(imageFile, callback){
-    fs.readFile(imageFile.path, function (err, data)
-    {
+function uploadImage(imageFile, callback) {
+    fs.readFile(imageFile.path, function (err, data) {
         imageName = imageFile.name;
-        if(imageName && imageName != "" )
-        {
+        if (imageName && imageName != "") {
             imageName = imageName.replace('.png', "");
-            imageName = imageName + '_' + Math.floor(Math.random()*(10000000-1)+21) + '.png';
+            imageName = imageName + '_' + Math.floor(Math.random() * (10000000 - 1) + 21) + '.png';
         }
-        
-        if(!imageName)
-        {
+
+        if (!imageName) {
             callback(imageName);
         }
-        else
-        {
-            newPath = "public/images/profilePics/"+imageName;
+        else {
+            newPath = "public/images/profilePics/" + imageName;
             /// write file to public/images/profilePics/ directory
             fs.writeFile(newPath, data, function (err) {
                 //Deleting main uploaded file.
-                fs.unlink(imageFile.path, function (error){
+                fs.unlink(imageFile.path, function (error) {
                     callback(imageName);
                 });
             });

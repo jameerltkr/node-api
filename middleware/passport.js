@@ -14,12 +14,13 @@ var Config = require('../bin/config');
 //==================== Passport Local Login ============================//
 //======================================================================//
 passport.use('login', new LocalStrategy({
+    usernameField: 'email',
     passReqToCallback: true
 },
   function (req, username, password, done) {
       console.log('Checking in Mongo if user exist or not');
       // check in mongo if a user with username exists or not
-      User.findOne({ 'username': username },
+      User.findOne({ 'email': username },
         function (err, user) {
             // In case of any error, return using the done method
             if (err)
@@ -115,12 +116,9 @@ passport.use('signup', new LocalStrategy({
 passport.use('login-google', new GoogleStrategy({
     clientID: '402166863300-ullhvi45ckloelig76o5is28nuif38gt.apps.googleusercontent.com',
     clientSecret: 'ytt2tWh62YecK_M_H9b6WSUO',
-    callbackURL: "http://localhost:3000/auth/google/callback"
+    callbackURL: "http://localhost:3000/api/auth/google/callback"
 },
   function (accessToken, refreshToken, profile, done) {
-      console.log('ID: ' + profile.id);
-      console.log('Name: ' + profile.displayName);
-      console.log('Email : ' + profile.emails[0].value);
       return done(null, profile);
   }
 ));

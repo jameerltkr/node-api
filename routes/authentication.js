@@ -25,11 +25,49 @@ router.get('/login-passport-google',
         res.send('Request is authenticated using Passport Local Authentication.');
     });
 
+router.get('/google/callback',
+  Passport.authenticate('login-google'), function (req, res) {
+      // Insert data in User table
+      User.findOne({ email: req.user.emails[0].value }, function (error, result) {
+          if (!result) {
+              var userPassword = MiddlewarePassport.CreateHash(req.user.emails[0].value);
+
+              var collection = new User({
+                  email: req.user.emails[0].value,
+                  name: req.user.displayName,
+                  username: req.user.displayName,
+                  website: "",
+                  bio: "",
+                  phone_number: "",
+                  gender: "",
+                  profile_pic: "",
+                  password: userPassword,
+                  role: "user"
+              });
+
+              collection.save(function (error, rs) {
+                  if (error) {
+                      res.status(500).send('Database Error: ' + error);
+                  }
+                  else {
+                      res.send('Request is authenticated using Passport Google Authentication.<br> User Details are::<br> ' + req.user.id + '<br>' + req.user.displayName + '<br>' + req.user.emails[0].value);
+
+                  }
+              });
+          } else {
+              res.send('Request is authenticated using Passport Google Authentication.<br> User Details are::<br> ' + req.user.id + '<br>' + req.user.displayName + '<br>' + req.user.emails[0].value);
+
+          }
+      });
+
+  });
+
 router.get('/login-jwt', MiddlewareJwt.Auth, function (req, res, next) {
     console.log(req.isAuthenticated());
     res.send('Request is authenticated using JWT.');
 });
 
+// Not being used--------------------------
 router.post('/signup-jwt-test', function (req, res, next) {
 
     // find the user
