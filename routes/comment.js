@@ -3,6 +3,7 @@ var router = express.Router();
 var Comment = require('../model/comment');
 var CommentLike = require('../model/comment-like');
 var Status = require('../model/status');
+var roleUser = require('../middleware/role-management');
 var meta = { code: Number, data_property_name: String, error: String };
 var finalData = {};
 /* GET home page. */
@@ -11,7 +12,7 @@ router.get('/', function (req, res, next) {
 });
 
 //localhost:3000/api/comment/create
-router.post('/create', function (req, res, next) {
+router.post('/create', roleUser.can("access api"), function (req, res, next) {
 
     var collection = new Comment({
         text: req.body.text,
@@ -60,7 +61,7 @@ router.post('/create', function (req, res, next) {
 });
 
 //localhost:3000/api/comment/retrieve
-router.get('/retrieve', function (req, res, next) {
+router.get('/retrieve', roleUser.can("access api"), function (req, res, next) {
     Comment.find({})
     .populate('status_id')
     .populate('user_id')
@@ -88,7 +89,7 @@ router.get('/retrieve', function (req, res, next) {
 
 
 //localhost:3000/api/comment/retrieve/:commentId
-router.get('/retrieve/:commentId', function (req, res, next) {
+router.get('/retrieve/:commentId', roleUser.can("access api"), function (req, res, next) {
     Comment.findOne({ _id: req.params.commentId })
     .populate('status_id')
     .populate('user_id')
@@ -115,7 +116,7 @@ router.get('/retrieve/:commentId', function (req, res, next) {
 
 
 //localhost:3000/api/comment/retrieve-by-user/:userId
-router.get('/retrieve-by-user/:userId', function (req, res, next) {
+router.get('/retrieve-by-user/:userId', roleUser.can("access api"), function (req, res, next) {
     Comment.findOne({ user_id: req.params.userId })
     .populate('status_id')
     .populate('user_id')
@@ -141,7 +142,7 @@ router.get('/retrieve-by-user/:userId', function (req, res, next) {
 });
 
 //localhost:3000/api/comment/retrieve-by-status/:status_id
-router.get('/retrieve-by-status/:status_id', function (req, res, next) {
+router.get('/retrieve-by-status/:status_id', roleUser.can("access api"), function (req, res, next) {
     Comment.findOne({ status_id: req.params.status_id })
     .populate('status_id')
     .populate('user_id')
@@ -167,7 +168,7 @@ router.get('/retrieve-by-status/:status_id', function (req, res, next) {
 });
 
 //localhost:3000/api/comment/update/:commentId
-router.put('/update/:commentId', function (req, res, next) {
+router.put('/update/:commentId', roleUser.can("access api"), function (req, res, next) {
     Comment.update({ '_id': req.params.commentId }, req.body, { safe: true }, function (error, result) {
         if (error) {
             console.log("> Getting Error in comment/update/:commentId.", error);
@@ -190,7 +191,7 @@ router.put('/update/:commentId', function (req, res, next) {
 });
 
 //localhost:3000/api/comment/delete/:statusId
-router.delete('/delete/:commentId', function (req, res, next) {
+router.delete('/delete/:commentId', roleUser.can("access api"), function (req, res, next) {
     Comment.remove({ _id: req.params.commentId }, function (error, result) {
         if (error) {
             console.log("> Getting Error in comment/delete/:commentId.", error);
@@ -213,7 +214,7 @@ router.delete('/delete/:commentId', function (req, res, next) {
 });
 
 
-router.post('/add-comment-like', function (req, res, next) {
+router.post('/add-comment-like', roleUser.can("access api"), function (req, res, next) {
 
     var collection = new CommentLike({
         comment_id: req.body.comment_id,

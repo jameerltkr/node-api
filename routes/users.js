@@ -24,7 +24,7 @@ router.post('/create', roleUser.can("register"), multipartMiddleware, function (
 
     var userPassword = MiddlewarePassport.CreateHash(req.body.password);
 
-    uploadImage(req.files.profile_pic, function (uploadedImagePath) {
+  //  uploadImage(req.files.profile_pic, function (uploadedImagePath) {
         var collection = new User({
             email: req.body.email,
             name: req.body.name,
@@ -33,7 +33,7 @@ router.post('/create', roleUser.can("register"), multipartMiddleware, function (
             bio: req.body.bio,
             phone_number: req.body.phone_number,
             gender: req.body.gender,
-            profile_pic: uploadedImagePath,
+            profile_pic: 'uploadedImagePath',
             password: userPassword,
             role: req.body.role
         });
@@ -65,7 +65,7 @@ router.post('/create', roleUser.can("register"), multipartMiddleware, function (
             });
             res.send(json);
         });
-    })
+   // })
 
 });
 

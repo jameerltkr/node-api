@@ -62,6 +62,20 @@ router.get('/google/callback',
 
   });
 
+// route for facebook authentication and login
+// different scopes while logging in
+router.get('/login-passport-facebook',
+  Passport.authenticate('facebook', { scope: 'email' }
+));
+
+// handle the callback after facebook has authenticated the user
+router.get('/facebook/callback',
+  Passport.authenticate('facebook'),
+  function (req, res) {
+      res.send('Request is authenticated using Passport Facebook Authentication.<br> User Details are::<br> ' + req.user.id + '<br>' + req.user.name + '<br>' + req.user.email);
+  }
+);
+
 router.get('/login-jwt', MiddlewareJwt.Auth, function (req, res, next) {
     console.log(req.isAuthenticated());
     res.send('Request is authenticated using JWT.');

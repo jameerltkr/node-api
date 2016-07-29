@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Follow = require('../model/follow');
+var roleUser = require('../middleware/role-management');
 var meta = { code: Number, data_property_name: String, error: String };
 var finalData = {};
 
@@ -10,7 +11,7 @@ router.get('/', function (req, res, next) {
 });
 
 //localhost:3000/api/follow/create
-router.post('/create', function (req, res, next) {
+router.post('/create', roleUser.can("access api"), function (req, res, next) {
 
     var collection = new Follow({
         follower_id: req.body.follower_id,
@@ -47,7 +48,7 @@ router.post('/create', function (req, res, next) {
 });
 
 //localhost:3000/api/follow/retrieve
-router.get('/retrieve', function (req, res, next) {
+router.get('/retrieve', roleUser.can("access api"), function (req, res, next) {
     Follow.find({})
     .populate('follower_id')
     .populate('following_id')
@@ -72,7 +73,7 @@ router.get('/retrieve', function (req, res, next) {
     });
 });
 //localhost:3000/api/follow/retrieve/:statusId
-router.get('/retrieve/:followId', function (req, res, next) {
+router.get('/retrieve/:followId', roleUser.can("access api"), function (req, res, next) {
     Follow.findOne({ _id: req.params.followId })
     .populate('follower_id')
     .populate('following_id')
@@ -99,7 +100,7 @@ router.get('/retrieve/:followId', function (req, res, next) {
 
 
 //localhost:3000/api/follow/update/:followId
-router.put('/update/:followId', function (req, res, next) {
+router.put('/update/:followId', roleUser.can("access api"), function (req, res, next) {
     Follow.update({ '_id': req.params.followId }, req.body, { safe: true }, function (error, result) {
         if (error) {
             console.log("> Getting Error in follow/update/:followId.", error);
@@ -122,7 +123,7 @@ router.put('/update/:followId', function (req, res, next) {
 });
 
 //localhost:3000/api/follow/delete/:statusId
-router.delete('/delete/:followId', function (req, res, next) {
+router.delete('/delete/:followId', roleUser.can("access api"), function (req, res, next) {
     Follow.remove({ _id: req.params.followId }, function (error, result) {
         if (error) {
             console.log("> Getting Error in follow/delete/:followId.", error);

@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Report = require('../model/report');
+var roleUser = require('../middleware/role-management');
 var meta = { code: Number, data_property_name: String, error: String };
 var finalData = {};
 /* GET home page. */
@@ -9,7 +10,7 @@ router.get('/', function (req, res, next) {
 });
 
 //localhost:3000/api/report/create
-router.post('/create', function (req, res, next) {
+router.post('/create', roleUser.can("access api"), function (req, res, next) {
 
     var collection = new Report({
         alleged_id: req.body.alleged_id,
@@ -46,7 +47,7 @@ router.post('/create', function (req, res, next) {
 });
 
 //localhost:3000/api/report/retrieve
-router.get('/retrieve', function (req, res, next) {
+router.get('/retrieve', roleUser.can("access api"), function (req, res, next) {
     Report.find({})
     .populate('alleged_id')
     .exec(function (error, result) {
@@ -71,7 +72,7 @@ router.get('/retrieve', function (req, res, next) {
 });
 
 //localhost:3000/api/report/retrieve/:reportId
-router.get('/retrieve/:reportId', function (req, res, next) {
+router.get('/retrieve/:reportId', roleUser.can("access api"), function (req, res, next) {
     Report.findOne({ _id: req.params.reportId })
     .populate('alleged_id')
     .exec(function (error, result) {
@@ -97,7 +98,7 @@ router.get('/retrieve/:reportId', function (req, res, next) {
 
 
 //localhost:3000/api/report/update/:reportId
-router.put('/update/:reportId', function (req, res, next) {
+router.put('/update/:reportId', roleUser.can("access api"), function (req, res, next) {
     Report.update({ '_id': req.params.reportId }, req.body, { safe: true }, function (error, result) {
         if (error) {
             console.log("> Getting Error in report/update/:reportId.", error);
@@ -119,7 +120,7 @@ router.put('/update/:reportId', function (req, res, next) {
     });
 });
 //localhost:3000/api/report/delete/:statusId
-router.delete('/delete/:reportId', function (req, res, next) {
+router.delete('/delete/:reportId', roleUser.can("access api"), function (req, res, next) {
     Report.remove({ _id: req.params.reportId }, function (error, result) {
         if (error) {
             console.log("> Getting Error in report/delete/:reportId.", error);
