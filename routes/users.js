@@ -61,7 +61,7 @@ router.post('/create', roleUser.can("register"), multipartMiddleware, function (
             var json = JSON.stringify({
                 'meta': Meta,
                 'data': FinalData,
-                'token': MiddlewareJwt.GenerateToken(result)
+                'token': result?MiddlewareJwt.GenerateToken(result):''
             });
             res.send(json);
         });
