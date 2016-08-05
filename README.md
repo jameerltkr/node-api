@@ -1,3 +1,0 @@
-# node-api
-
-Private Project!!!
